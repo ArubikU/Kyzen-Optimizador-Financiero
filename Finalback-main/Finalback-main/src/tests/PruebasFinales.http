@@ -1,0 +1,23 @@
+### 4D. Ver Detalle de Orden por ID (Cliente)
+# Reemplaza 1 por el ID real de una orden que el cliente haya creado
+GET http://localhost:4000/api/orders/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mywicm9sZSI6InVzZXIiLCJpYXQiOjE3NjQ0NTU4NjYsImV4cCI6MTc2NzA0Nzg2Nn0.NfsbGmLgCpvKZk4pWUYBrTkLt4UbSNZOwbIwdYWbh-Q
+
+### 4D. Ver Detalle de Orden por ID (Cliente)
+# Reemplaza 1 por el ID real de una orden que el cliente haya creado
+GET http://localhost:4000/api/orders/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mywicm9sZSI6InVzZXIiLCJpYXQiOjE3NjQ0NTU4NjYsImV4cCI6MTc2NzA0Nzg2Nn0.NfsbGmLgCpvKZk4pWUYBrTkLt4UbSNZOwbIwdYWbh-Q
+
+### 2F. Obtener Producto por ID (Público)
+GET http://localhost:4000/api/products/1
+
+### 2E. Editar Producto (Admin Only)
+# Cambiamos el precio de la Xbox (ID 1)
+PUT http://localhost:4000/api/products/1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzY0NDU1NDI0LCJleHAiOjE3NjcwNDc0MjR9.DUjZ5fgaeRi5lRM7meyj696xmPf0ak6wbM85BArYk7g
+
+{
+    "price": 2500.00,
+    "stock": 5
+}

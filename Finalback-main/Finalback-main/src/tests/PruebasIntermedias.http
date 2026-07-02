@@ -1,0 +1,147 @@
+### ==================================================================
+### 1. AUTENTICACIÓN Y SEGURIDAD
+### ==================================================================
+
+### 1A. Login de Admin (Para obtener token maestro)
+# @name loginAdmin
+POST http://localhost:4000/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "superadmin@test.com",
+    "password": "securepassword"
+}
+###Funciona
+
+### 1B. Login Fallido (Contraseña incorrecta)
+# Esperado: 401 Unauthorized
+POST http://localhost:4000/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "superadmin@test.com",
+    "password": "WRONGPASSWORD"
+}
+###Funciona
+
+### 1C. Registro de Usuario Nuevo (Cliente)
+# @name registerClient
+POST http://localhost:4000/api/auth/register
+Content-Type: application/json
+
+{
+    "name": "Cliente A",
+    "email": "clienteA@test.com",
+    "password": "passwordA",
+    "country": "Peru"
+}
+###Funciona
+
+
+
+### ==================================================================
+### 2. GESTIÓN DE CATÁLOGO (Categorías y Productos)
+### ==================================================================
+
+### 2A. Listar Categorías (Público)
+GET http://localhost:4000/api/categories
+
+###Funciona
+
+### 2B. Crear Categoría (Admin Only)
+# @name createCat
+POST http://localhost:4000/api/categories
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzY0NDU1NDI0LCJleHAiOjE3NjcwNDc0MjR9.DUjZ5fgaeRi5lRM7meyj696xmPf0ak6wbM85BArYk7g
+
+{
+    "name": "Ofertas Flash",
+    "description": "Categoría temporal para pruebas"
+}
+###Funciona
+
+
+### 2C. Intentar Crear Categoría (Cliente - Debe fallar)
+# Esperado: 403 Forbidden
+POST http://localhost:4000/api/categories
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mywicm9sZSI6InVzZXIiLCJpYXQiOjE3NjQ0NTU4NjYsImV4cCI6MTc2NzA0Nzg2Nn0.NfsbGmLgCpvKZk4pWUYBrTkLt4UbSNZOwbIwdYWbh-Q
+
+{
+    "name": "Hacker Category"
+}
+
+###Funciona
+
+### 2D. Eliminar Categoría (Admin Only)
+DELETE http://localhost:4000/api/categories/4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzY0NDU1NDI0LCJleHAiOjE3NjcwNDc0MjR9.DUjZ5fgaeRi5lRM7meyj696xmPf0ak6wbM85BArYk7g
+###Funciona
+
+
+
+
+### ==================================================================
+### 3. FLUJO DE COMPRA (Carrito y Orden)
+### ==================================================================
+
+
+### 3A. Agregar al Carrito (Cliente)
+POST http://localhost:4000/api/cart
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mywicm9sZSI6InVzZXIiLCJpYXQiOjE3NjQ0NTU4NjYsImV4cCI6MTc2NzA0Nzg2Nn0.NfsbGmLgCpvKZk4pWUYBrTkLt4UbSNZOwbIwdYWbh-Q
+
+{
+    "productId": 1,
+    "quantity": 1
+}
+
+### 3B. Ver Carrito (Cliente)
+# Esperado: Debe tener 1 item
+GET http://localhost:4000/api/cart
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mywicm9sZSI6InVzZXIiLCJpYXQiOjE3NjQ0NTU4NjYsImV4cCI6MTc2NzA0Nzg2Nn0.NfsbGmLgCpvKZk4pWUYBrTkLt4UbSNZOwbIwdYWbh-Q
+
+### 3C. Crear Orden (Checkout)
+POST http://localhost:4000/api/orders
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mywicm9sZSI6InVzZXIiLCJpYXQiOjE3NjQ0NTU4NjYsImV4cCI6MTc2NzA0Nzg2Nn0.NfsbGmLgCpvKZk4pWUYBrTkLt4UbSNZOwbIwdYWbh-Q
+
+{
+  "orderItems": [
+    {
+      "product": 1, 
+      "name": "Xbox Series X Test",
+      "quantity": 1,
+      "imageUrl": "http://img.com",
+      "price": 2399.00
+    }
+  ],
+  "shippingAddress": { "address": "Calle Test 123" },
+  "paymentMethod": "qr",
+  "totalPrice": 2399.00
+}
+
+### 3D. Verificar que el Carrito se vació
+# Esperado: items: []
+GET http://localhost:4000/api/cart
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mywicm9sZSI6InVzZXIiLCJpYXQiOjE3NjQ0NTU4NjYsImV4cCI6MTc2NzA0Nzg2Nn0.NfsbGmLgCpvKZk4pWUYBrTkLt4UbSNZOwbIwdYWbh-Q
+
+
+### ==================================================================
+### 4. HISTORIAL Y ADMINISTRACIÓN DE ÓRDENES
+### ==================================================================
+
+### 4A. Ver Mis Órdenes (Cliente)
+# Esperado: Al menos 1 orden
+GET http://localhost:4000/api/orders/myorders
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mywicm9sZSI6InVzZXIiLCJpYXQiOjE3NjQ0NTU4NjYsImV4cCI6MTc2NzA0Nzg2Nn0.NfsbGmLgCpvKZk4pWUYBrTkLt4UbSNZOwbIwdYWbh-Q
+
+### 4B. Ver Todas las Órdenes (Admin)
+# Esperado: Lista completa de todas las órdenes del sistema
+GET http://localhost:4000/api/orders/admin
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzY0NDU1NDI0LCJleHAiOjE3NjcwNDc0MjR9.DUjZ5fgaeRi5lRM7meyj696xmPf0ak6wbM85BArYk7g
+
+### 4C. Intento de Acceso Admin (Cliente - Debe fallar)
+# Esperado: 403 Forbidden
+GET http://localhost:4000/api/orders/admin
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mywicm9sZSI6InVzZXIiLCJpYXQiOjE3NjQ0NTU4NjYsImV4cCI6MTc2NzA0Nzg2Nn0.NfsbGmLgCpvKZk4pWUYBrTkLt4UbSNZOwbIwdYWbh-Q

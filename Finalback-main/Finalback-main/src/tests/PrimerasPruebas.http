@@ -1,0 +1,168 @@
+### ==================================================================
+### 🧪 SUITE DE PRUEBAS DE INTEGRACIÓN: API REST KYZEN
+### ==================================================================
+
+### ==================================================================
+### 1. FLUJO DE AUTENTICACIÓN Y REGISTRO MULTI-ETAPA (FIGMA 2, 3 y 13)
+### ==================================================================
+
+### 1A. Registro - Paso 1 y 2: Identidad y Credenciales del Estudiante
+# Envía los campos requeridos. El backend generará un código de 5 dígitos en tu consola.
+# @name registerUser
+POST http://localhost:4000/api/auth/register
+Content-Type: application/json
+
+{
+    "firstName": "Rodrigo Raúl",
+    "lastName": "Quicaño Alcantara",
+    "birthDate": "2003-05-15",
+    "phone": "+51 999 000 000",
+    "email": "rodrigo.test@ulima.edu.pe",
+    "password": "estudianteulima2026"
+}
+
+###
+
+### 1B. Registro - Paso 3: Validación del Código OTP Recibido por Correo
+# 👀 Copia el código de 5 dígitos que se imprimió en la terminal de tu Node.js y ponlo aquí.
+POST http://localhost:4000/api/auth/verify-otp
+Content-Type: application/json
+
+{
+    "email": "rodrigo.test@ulima.edu.pe",
+    "code": "11873"
+}
+
+###
+
+### 1C. Iniciar Sesión (Login Clásico - Figma Pantalla 3)
+# Al autenticar con éxito, guardamos dinámicamente el token Bearer en una variable.
+# @name loginUser
+POST http://localhost:4000/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "tu@correo.com",
+    "password": "password123"
+}
+
+### Variable Automática del Token para las Rutas Privadas
+@authToken = {{loginUser.response.body.token}}
+
+###
+
+### 1D. Recuperación de Credenciales - Paso 1: Disparar Token de Olvido
+POST http://localhost:4000/api/auth/forgot-password
+Content-Type: application/json
+
+{
+    "email": "tu@correo.com"
+}
+
+###
+
+### 1E. Recuperación de Credenciales - Paso 3: Setear Nueva Contraseña con OTP
+# Reemplaza el token con el código de 5 dígitos generado en la terminal de recuperación.
+POST http://localhost:4000/api/auth/reset-password
+Content-Type: application/json
+
+{
+    "email": "tu@correo.com",
+    "token": "REEMPLAZA_CON_EL_TOKEN_OTP",
+    "newPassword": "nuevaContrasenaSegura2026"
+}
+
+
+### ==================================================================
+### 2. CORE FINANCIERO: DASHBOARD Y ANALÍTICA (FIGMA 4, 7 y 8)
+### ==================================================================
+
+### 2A. Consumir Métricas del Dashboard (Pantalla Core)
+# Valida de forma matemática el balance neto (S/. 850), ingresos (S/. 1500) y egresos (S/. 650).
+# Alerta presupuestaria del 85%: Si la simulación de 'Entretenimiento/Ocio' excede los S/. 255, 
+# se inyectará de forma reactiva la card de alerta de fondo Amarillo Pastel.
+GET http://localhost:4000/api/dashboard/summary
+Authorization: Bearer {{authToken}}
+
+###
+
+### 2B. Consultar Categorías de Flujo de Caja Existentes
+# Traerá el listado con los colores hexadecimales y emojis asignados (🍔, 🚌, 🎓) para las gráficas.
+GET http://localhost:4000/api/categories
+
+
+### ==================================================================
+### 3. MOVIMIENTOS: TRANSACCIONES E HISTORIAL CRONOLÓGICO (FIGMA 5 y 6)
+### ==================================================================
+
+### 3A. Registrar una Nueva Transacción (Gasto Manual - Figma Pantalla 5)
+# El microservicio del backend evaluará el texto 'Almuerzo' en la descripción 
+# y autoseleccionará mecánicamente la categoría 'Comida' inyectándola en la base de datos.
+POST http://localhost:4000/api/transactions
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+    "type": "gasto",
+    "amount": 25.50,
+    "description": "Almuerzo en el comedor de la universidad",
+    "date": "2026-06-16T13:00:00",
+    "voucherUrl": "https://neon-storage.local/vouchers/yape_tx_9841.png"
+}
+
+###
+
+### 3B. Consultar Historial de Movimientos Completo (Figma Pantalla 6)
+# Devuelve la lista de transacciones ordenada cronológicamente del más nuevo al más antiguo.
+GET http://localhost:4000/api/transactions
+Authorization: Bearer {{authToken}}
+
+###
+
+### 3C. Consultar Historial Filtrado por Parámetros Dinámicos
+# Simula el uso de los botones superiores de filtro de Figma (Ej: Solo gastos de la categoría 'Comida')
+GET http://localhost:4000/api/transactions?type=gasto&category=Comida
+Authorization: Bearer {{authToken}}
+
+
+### ==================================================================
+### 4. PLANIFICACIÓN: METAS DE AHORRO ESTUDIANTILES (FIGMA 9 y 10)
+### ==================================================================
+
+### 4A. Crear una Nueva Meta de Ahorro (Figma Pantalla 10)
+# Definimos el monto objetivo (S/. 2500) y la fecha límite en el calendario.
+# El backend calculará de forma analítica la proyección de la cuota mensual recomendada.
+POST http://localhost:4000/api/goals
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+    "name": "Laptop Nueva para Ingeniería",
+    "targetAmount": 2400.00,
+    "deadline": "2026-12-31",
+    "categoryIcon": "💻"
+}
+
+###
+
+### 4B. Consultar Listado de Metas Activas (Figma Pantalla 9)
+# Retorna tus objetivos de ahorro. Verifica que el atributo 'progressPercentage' calcule 
+# dinámicamente el progreso exacto para pintar la barra de progreso verde esmeralda.
+GET http://localhost:4000/api/goals
+Authorization: Bearer {{authToken}}
+
+
+### ==================================================================
+### 5. SEGURIDAD: INTENTOS DE INTRUSIÓN (Verificación del Middleware protect)
+### ==================================================================
+
+### 5A. Intentar acceder al Dashboard sin enviar Token Bearer
+# Esperado: 401 Unauthorized - No autorizado, token faltante
+GET http://localhost:4000/api/dashboard/summary
+
+###
+
+### 5B. Intentar acceder al Dashboard enviando un Token manipulado o corrupto
+# Esperado: 401 Unauthorized - Token no válido
+GET http://localhost:4000/api/dashboard/summary
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.TOKEN_MANIPULADO_HACK
