@@ -1,4 +1,5 @@
 import express from 'express';
+import { UPLOADS_DIR } from './src/utils/voucherStorage.js';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import sequelize from './src/Config/database.js'; // 🚀 IMPORTAMOS TU CONEXIÓN LOCAL
@@ -26,7 +27,8 @@ app.use(cors({
   credentials: true 
 }));
 
-app.use(express.json()); 
+app.use(express.json({ limit: '8mb' })); // comprobantes de hasta 5MB en base64
+app.use('/uploads', express.static(UPLOADS_DIR));
 
 // Endpoint de verificación inicial (Ahora reporta estado de base de datos)
 app.get('/', (req, res) => {

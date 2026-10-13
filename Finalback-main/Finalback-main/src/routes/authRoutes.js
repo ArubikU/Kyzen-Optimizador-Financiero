@@ -1,11 +1,15 @@
 import express from 'express';
+import { protect } from '../middleware/authMiddleware.js';
 import { 
   registerUser, 
   verifyOtp, 
   authUser, 
   forgotPassword, 
   verifyResetCode, // 🚀 Importamos el nuevo validador intermedio del Paso 2
-  resetPassword 
+  resetPassword,
+  getProfile,
+  updateBudget,
+  changePassword
 } from '../controllers/authController.js';
 
 const router = express.Router();
@@ -22,5 +26,10 @@ router.post('/login', authUser);
 router.post('/forgot-password', forgotPassword);
 router.post('/verify-code', verifyResetCode); // 🚀 Ruta del Paso 2 conectada al validador del código de 6 dígitos
 router.post('/reset-password', resetPassword);
+
+// --- PERFIL Y PRESUPUESTO (HU-06 / HU-20) ---
+router.get('/profile', protect, getProfile);
+router.put('/budget', protect, updateBudget);
+router.put('/change-password', protect, changePassword);
 
 export default router;

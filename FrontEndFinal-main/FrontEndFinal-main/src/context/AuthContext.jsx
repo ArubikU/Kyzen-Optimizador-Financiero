@@ -123,6 +123,10 @@ export function FinancialProvider({ children }) {
         body: JSON.stringify(txData)
       });
       
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        return { success: false, message: errBody.message || 'No se pudo guardar el movimiento.' };
+      }
       if (res.ok) {
         const result = await res.json();
         
@@ -140,6 +144,41 @@ export function FinancialProvider({ children }) {
       console.error("Error registrando movimiento:", err);
     }
     return { success: false };
+  };
+
+  // HU-20: presupuesto mensual que alimenta el módulo de alertas por umbral (80%)
+  const updateBudget = async (monthlyBudget) => {
+    try {
+      const res = await fetch('http://localhost:4000/api/auth/budget', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+        body: JSON.stringify({ monthlyBudget })
+      });
+      const body = await res.json().catch(() => ({}));
+      if (res.ok) {
+        await fetchDashboardSummary();
+        return { success: true };
+      }
+      return { success: false, message: body.message };
+    } catch (err) {
+      return { success: false, message: 'No se pudo conectar con el servidor.' };
+    }
+  };
+
+  // Exportación de transacciones a CSV desde el backend
+  const exportTransactionsCsv = async (period = 'Mensual') => {
+    const res = await fetch(`http://localhost:4000/api/transactions/export?period=${encodeURIComponent(period)}`, {
+      headers: getAuthHeader()
+    });
+    if (!res.ok) return { success: false };
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `kyzen-transacciones-${period.toLowerCase()}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    return { success: true };
   };
 
   const addGoal = async (goalData) => {
@@ -169,7 +208,7 @@ export function FinancialProvider({ children }) {
   return (
     <FinancialContext.Provider value={{
       token, user, dashboardData, transactions, goals, isLoading,
-      login, logout, addTransaction, addGoal, getAuthHeader,
+      login, logout, addTransaction, addGoal, getAuthHeader, updateBudget, exportTransactionsCsv,
       // 🚀 EXPORTACIÓN CLAVE: Añadimos fetchTransactions y fetchGoals explícitamente para evitar lecturas como undefined
       fetchTransactions,
       fetchGoals,

@@ -15,6 +15,9 @@ const User = sequelize.define('User', {
   email: { type: DataTypes.STRING, allowNull: false, unique: true, validate: { isEmail: true } },
   password: { type: DataTypes.STRING, allowNull: false },
   
+  // --- PRESUPUESTO MENSUAL (HU-20: umbral de alertas) ---
+  monthlyBudget: { type: DataTypes.FLOAT, allowNull: true, validate: { min: 0 } },
+
   // --- ETAPA 3: VERIFICACIÓN Y SEGURIDAD ---
   isVerified: { type: DataTypes.BOOLEAN, defaultValue: false },
   verificationCode: { type: DataTypes.STRING, allowNull: true }, // Código OTP para Registro

@@ -39,3 +39,29 @@ Antes de levantar el entorno local, asegúrate de tener instalado en tu estació
 ```bash
 git clone [https://github.com/tu-usuario-o-grupo/kyzen-local.git](https://github.com/tu-usuario-o-grupo/kyzen-local.git)
 cd kyzen-local
+
+---
+
+## Funcionalidades según el documento del Grupo 6
+
+| HU | Funcionalidad | Dónde |
+|----|---------------|-------|
+| HU-07 / HU-08 | Registro con correo válido y contraseña alfanumérica ≥ 8 caracteres; error de login genérico | `authController.js`, `utils/validators.js` |
+| HU-01 | Monto > 0 y categoría obligatoria en gastos (el botón Guardar se deshabilita) | `transactionController.js`, `MovementsPage.jsx` |
+| HU-03 | Comprobante JPG/PNG de máx. 5MB (`voucher: { mimeType, data }` en base64), servido en `/uploads` | `utils/voucherStorage.js` |
+| HU-20 | Alerta roja si el gasto del mes supera el 80% del presupuesto (`PUT /api/auth/budget`) | `utils/alertEngine.js`, `dashboardController.js` |
+| HU-12 | Dashboard con balance, gráfico por categoría y alerta reactiva | `dashboardController.js`, `DashboardPage.jsx` |
+| HU-06 | Perfil, cambio de contraseña (`PUT /api/auth/change-password`) y presupuesto | `authController.js`, `ProfilePage.jsx` |
+| Metas | CRUD de metas, `?currency=USD` recalcula montos y cuota mensual | `goalController.js`, `utils/currency.js` |
+| Exportación | `GET /api/transactions/export?period=Mensual|Semanal|Anual` (CSV) y PDF desde el perfil | `utils/csvExport.js` |
+
+### Pruebas unitarias (caja blanca)
+
+```bash
+cd Finalback-main/Finalback-main
+npm test
+```
+
+### Variables de entorno
+
+Copia `Finalback-main/Finalback-main/.env.example` a `.env`. Los códigos OTP de acceso rápido (`123456`, `111111`) ya **no** funcionan salvo que definas `ALLOW_DEV_OTP=true` en desarrollo; el OTP real se imprime en la consola del backend.

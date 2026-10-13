@@ -68,6 +68,10 @@ export default function RegisterPage() {
       setError('Completa todas tus credenciales de acceso.');
       return;
     }
+    if (formData.password.length < 8 || !/[A-Za-z]/.test(formData.password) || !/\d/.test(formData.password)) {
+      setError('La contraseña debe ser alfanumérica y tener mínimo 8 caracteres.');
+      return;
+    }
     if (formData.password !== formData.confirmPassword) {
       setError('Las contraseñas ingresadas no coinciden.');
       return;

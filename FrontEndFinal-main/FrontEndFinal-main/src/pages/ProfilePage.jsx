@@ -1,10 +1,31 @@
 import React, { useState } from 'react';
 import { useAuth, useFinancial } from '../context/AuthContext';
-import { Shield, Coins, Download, LogOut, ChevronRight, GraduationCap, CheckCircle, X, Calendar, FileText } from 'lucide-react';
+import { Wallet, Shield, Coins, Download, LogOut, ChevronRight, GraduationCap, CheckCircle, X, Calendar, FileText } from 'lucide-react';
 
 export default function ProfilePage() {
   const { user, logout, currency, setCurrency } = useAuth();
-  const { transactions } = useFinancial(); // Consumimos las transacciones reales del usuario para armar el PDF
+  const { transactions, dashboardData, updateBudget, exportTransactionsCsv } = useFinancial();
+
+  // --- HU-20: presupuesto mensual para el módulo de alertas ---
+  const [showBudgetModal, setShowBudgetModal] = useState(false);
+  const [budgetInput, setBudgetInput] = useState('');
+  const [budgetMsg, setBudgetMsg] = useState('');
+  const currentBudget = dashboardData?.budget?.monthlyBudget;
+
+  const handleSaveBudget = async (e) => {
+    e.preventDefault();
+    if (!(parseFloat(budgetInput) > 0)) {
+      setBudgetMsg('Ingresa un presupuesto mayor a 0.');
+      return;
+    }
+    const result = await updateBudget(parseFloat(budgetInput));
+    if (result.success) {
+      setBudgetMsg('');
+      setShowBudgetModal(false);
+    } else {
+      setBudgetMsg(result.message || 'No se pudo guardar el presupuesto.');
+    }
+  }; // Consumimos las transacciones reales del usuario para armar el PDF
   
   // --- ESTADOS DEL MODAL DE EXPORTACIÓN (FIGMA MATCH image_1a8e69.png) ---
   const [showExportModal, setShowExportModal] = useState(false);
@@ -193,6 +214,13 @@ export default function ProfilePage() {
       action: () => alert('Simulación: Enlace de restablecimiento enviado.')
     },
     {
+      title: 'Presupuesto mensual',
+      subtitle: currentBudget ? `Límite actual: S/ ${Number(currentBudget).toLocaleString('es-PE')} · alerta al 80%` : 'Define tu límite para recibir alertas tempranas',
+      icon: <Wallet size={18} className="text-amber-600" />,
+      bg: 'bg-amber-50',
+      action: () => { setBudgetInput(currentBudget ? String(currentBudget) : ''); setBudgetMsg(''); setShowBudgetModal(true); }
+    },
+    {
       title: 'Preferencias de moneda',
       // Muestra dinámicamente qué moneda está activa en el contexto global
       subtitle: `Actualmente: ${currency === 'PEN' ? 'S/ (Sol peruano)' : '$ (Dólar estadounidense)'}`,
@@ -282,6 +310,21 @@ export default function ProfilePage() {
         </div>
       </div>
 
+      {showBudgetModal && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/40 backdrop-blur-sm animate-fadeIn">
+          <form onSubmit={handleSaveBudget} className="bg-white rounded-[28px] border border-slate-100 p-6 w-full max-w-sm mx-4 shadow-2xl space-y-4">
+            <h3 className="text-base font-black text-slate-900 tracking-tight">Presupuesto mensual</h3>
+            <p className="text-[11px] font-semibold text-slate-400">Te avisaremos en rojo cuando tus gastos del mes superen el 80% de este monto.</p>
+            <input type="number" min="1" value={budgetInput} onChange={(e) => setBudgetInput(e.target.value)} placeholder="S/ 0.00" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold" />
+            {budgetMsg && <p className="text-xs font-bold text-rose-500">{budgetMsg}</p>}
+            <div className="flex gap-2">
+              <button type="button" onClick={() => setShowBudgetModal(false)} className="flex-1 text-xs font-bold text-slate-400 py-3">Cancelar</button>
+              <button type="submit" className="flex-1 bg-[#6366f1] text-white font-black py-3 rounded-xl text-xs uppercase tracking-wider">Guardar</button>
+            </div>
+          </form>
+        </div>
+      )}
+
       {/* 🔮 MODAL DE EXPORTACIÓN HIGH-FIDELITY FIEL A image_1a8e69.png */}
       {showExportModal && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/40 backdrop-blur-sm animate-fadeIn">
@@ -362,7 +405,13 @@ export default function ProfilePage() {
 
             {/* Botones Inferiores de Acción */}
             <div className="flex flex-col gap-2 pt-6">
-              <button 
+              <button
+                onClick={() => exportTransactionsCsv(exportPeriod)}
+                className="w-full bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-black py-3 rounded-xl text-xs uppercase tracking-wider transition-all"
+              >
+                Descargar CSV
+              </button>
+              <button
                 onClick={handleDownloadPDF}
                 className="w-full bg-[#7c3aed] hover:bg-[#6d28d9] text-white font-black py-3 rounded-xl shadow-md shadow-purple-100 text-xs uppercase tracking-wider transition-all hover:scale-[1.01] active:scale-95"
               >
