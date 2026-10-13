@@ -9,6 +9,7 @@ const seedDatabase = async () => {
 
     // Inyectamos únicamente las categorías de flujo fintech oficiales de Kyzen
     const coreCategories = [
+      { name: 'Comida', type: 'gasto', icon: '🍔', color: '#6366f1' },
       { name: 'Viaje', type: 'gasto', icon: '✈️', color: '#818cf8' },
       { name: 'Transporte', type: 'gasto', icon: '🚌', color: '#93c5fd' },
       { name: 'Estudios', type: 'gasto', icon: '🎓', color: '#22d3ee' },
@@ -19,7 +20,7 @@ const seedDatabase = async () => {
     ];
 
     await Category.bulkCreate(coreCategories);
-    console.log('✅ ¡Las 7 Categorías oficiales de Kyzen han sido cargadas con éxito!');
+    console.log('✅ ¡Las 8 Categorías oficiales de Kyzen han sido cargadas con éxito!');
     
     process.exit(0);
   } catch (error) {

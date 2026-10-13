@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useFinancial } from '../context/AuthContext';
 import { 
-  ArrowLeft, Save, Plane, Car, GraduationCap, Zap, Home, 
+  ArrowLeft, Save, Utensils, Plane, Car, GraduationCap, Zap, Home, 
   MoreHorizontal, FileText, Plus, Search 
 } from 'lucide-react';
 
@@ -20,6 +20,7 @@ export default function MovementsPage({ isCreating, setIsCreating }) {
   const [searchTerm, setSearchTerm] = useState('');
 
   const categoriesList = [
+    { id: 'Comida', label: 'Comida', icon: Utensils },
     { id: 'Viaje', label: 'Viaje', icon: Plane },
     { id: 'Transporte', label: 'Transporte', icon: Car },
     { id: 'Estudios', label: 'Estudios', icon: GraduationCap },

@@ -19,8 +19,9 @@ export default function DashboardPage({ onNavigateToAiHub }) {
   const currentBalance = totalIncome - totalExpenses;
 
   // --- 📊 DISTRIBUCIÓN POR CATEGORÍAS (LAS 6 OFICIALES) ---
-  const categories = ['Viaje', 'Transporte', 'Estudios', 'Servicios', 'Hogar', 'Otros'];
+  const categories = ['Comida', 'Viaje', 'Transporte', 'Estudios', 'Servicios', 'Hogar', 'Otros'];
   const categoryColors = {
+    Comida: '#6366f1',
     Viaje: '#818cf8',
     Transporte: '#93c5fd',
     Estudios: '#22d3ee',
